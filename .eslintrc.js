@@ -1,0 +1,23 @@
+module.exports = {
+    extends: ['airbnb', 'prettier'],
+    plugins: ['prettier'],
+    rules: {
+        'prettier/prettier': ['error'],
+        'linebreak-style': ['error', 'unix'],
+        semi: ['off', 'always'],
+        'no-dupe-class-members': ['off', 'always'],
+        'no-underscore-dangle': ['off'],
+        'no-plusplus': ['off'],
+        'no-param-reassign': ['off'],
+        'max-len': ['off'],
+        indent: ['off'],
+        'no-use-before-define': ['off'],
+        'no-tabs': ['off'],
+        'class-methods-use-this': ['off'],
+        'no-console': ['off'],
+        'arrow-parens': ['off'],
+        'arrow-body-style': ['off'],
+        'prefer-destructuring': ['off'],
+        'comma-dangle': ['off'],
+    },
+}
