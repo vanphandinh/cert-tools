@@ -32,10 +32,10 @@ const getById = id => {
     })
 }
 
-const getOneByCondition = condition => {
+const getOneByCondition = conditions => {
     return new Promise((resolve, reject) => {
         model
-            .findOne(condition)
+            .findOne(conditions)
             .then(result => {
                 if (result) resolve(result._doc)
                 else resolve()
@@ -46,10 +46,10 @@ const getOneByCondition = condition => {
     })
 }
 
-const getManyByCondition = condition => {
+const getManyByCondition = conditions => {
     return new Promise((resolve, reject) => {
         model
-            .find(condition)
+            .find(conditions)
             .then(result => {
                 if (result) {
                     result = _.map(result, e => e._doc)
@@ -78,8 +78,8 @@ const getAll = () => {
     })
 }
 
-const updateById = (id, doc) => {
-    return model.updateOne({ _id: id }, doc)
+const updateById = (id, docs) => {
+    return model.updateOne({ _id: id }, docs)
 }
 
 const removeById = id => {

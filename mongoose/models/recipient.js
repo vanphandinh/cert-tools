@@ -1,12 +1,9 @@
 const _ = require('lodash')
 const mongoose = require('mongoose')
-const schema = require('../schemas/certification.template')
+const schema = require('../schemas/recipient')
 const CONSTANTS = require('../../helpers/constants')
 
-const model = mongoose.model(
-    CONSTANTS.COLLECTIONS.CERTIFICATION_TEMPLATES,
-    schema
-)
+const model = mongoose.model(CONSTANTS.COLLECTIONS.RECIPIENTS, schema)
 
 const create = docs => {
     return new Promise((resolve, reject) => {
@@ -26,24 +23,6 @@ const getById = id => {
     return new Promise((resolve, reject) => {
         model
             .findById(id)
-            .then(result => {
-                if (result) resolve(result._doc)
-                else resolve()
-            })
-            .catch(error => {
-                reject(error.message)
-            })
-    })
-}
-
-const getByIdAndPopulate = (id, populateFields) => {
-    return new Promise((resolve, reject) => {
-        const query = model.findById(id)
-        _.forEach(populateFields, f => {
-            query.populate(f)
-        })
-        query
-            .exec()
             .then(result => {
                 if (result) resolve(result._doc)
                 else resolve()
@@ -85,23 +64,15 @@ const getManyByCondition = conditions => {
 }
 
 const getAll = () => {
-    return new Promise((resolve, reject) => {
-        model
-            .find({})
-            .then(result => {
-                if (result) {
-                    result = _.map(result, e => e._doc)
-                    resolve(result)
-                } else resolve()
-            })
-            .catch(error => {
-                reject(error.message)
-            })
-    })
+    return getManyByCondition({})
 }
 
 const updateById = (id, docs) => {
     return model.updateOne({ _id: id }, docs)
+}
+
+const updateManyByCondition = (conditions, docs) => {
+    return model.updateMany(conditions, { $set: docs })
 }
 
 const removeById = id => {
@@ -115,11 +86,11 @@ const removeAll = () => {
 module.exports = {
     create,
     getById,
-    getByIdAndPopulate,
     getOneByCondition,
     getManyByCondition,
     getAll,
     updateById,
+    updateManyByCondition,
     removeById,
     removeAll,
 }

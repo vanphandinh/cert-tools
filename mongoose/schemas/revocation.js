@@ -2,9 +2,9 @@ const { Schema } = require('mongoose')
 
 const revocationSchema = new Schema(
     {
-        id: String,
+        id: { type: String, required: true },
         revocationReason: String,
-        issuerId: String,
+        issuerId: { type: String, required: true },
     },
     { timestamps: true, versionKey: false }
 )

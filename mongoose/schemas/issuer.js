@@ -17,6 +17,7 @@ const issuerSchema = new Schema(
         issuerTemplate: {
             type: String,
             ref: CONSTANTS.COLLECTIONS.ISSUER_TEMPLATES,
+            required: true,
         },
     },
     { timestamps: true, versionKey: false }

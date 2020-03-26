@@ -7,13 +7,21 @@ const config = require('../config')
 const utils = require('../helpers/utils')
 const CONSTANTS = require('../helpers/constants')
 
-const createIssuer = async docs => {
-    let { issuerTemplateId, publicKey } = docs
+const createIssuer = async ({
+    issuerTemplateId,
+    publicKey,
+    name,
+    email,
+    image,
+    url,
+    description,
+    telephone,
+}) => {
+    //TODO: verify
     publicKey = _.map(publicKey, e => {
-        return {
-            id: e,
-            created: utils.createIso8601String(),
-        }
+        e.created = utils.createIso8601String()
+        e.id = e.id.toLowerCase()
+        return e
     })
     const _id = uuidv1()
 
@@ -26,7 +34,7 @@ const createIssuer = async docs => {
             throw new Error('Issuer template is not exist')
         }
     } else {
-        const { name, email, image, url, description, telephone } = docs
+        //TODO: verify
         issuerTemplateId = await issuerTemplateModel.create({
             _id,
             name,
@@ -46,7 +54,7 @@ const createIssuer = async docs => {
     return issuerId
 }
 
-const getIssuer = async issuerId => {
+const generateIssuer = async issuerId => {
     const issuer = await issuerModel.getByIdAndPopulate(issuerId, [
         'issuerTemplate',
     ])
@@ -76,7 +84,10 @@ const getIssuer = async issuerId => {
     return issuerProfile
 }
 
-const getRevocationList = async issuerId => {
+const generateRevocationList = async issuerId => {
+    if (!issuerId) throw new Error('issuerId field is missing')
+    const issuerInstance = await issuerModel.getById(issuerId)
+    if (!issuerInstance) throw new Error('Issuer is not exist')
     let revokedAssertions = await revocationModel.getManyByCondition({
         issuerId,
     })
@@ -97,8 +108,8 @@ const getRevocationList = async issuerId => {
     return revocationList
 }
 
-const createRevocation = async (issuerId, docs) => {
-    const { id } = docs
+const createRevocation = async (issuerId, { id, revocationReason }) => {
+    //TODO: verify
     const [issuer, revocation] = await Promise.all([
         issuerModel.getById(issuerId),
         revocationModel.getOneByCondition({ issuerId, id }),
@@ -108,14 +119,21 @@ const createRevocation = async (issuerId, docs) => {
         throw new Error('The certification has been already revoked')
     const revocationId = await revocationModel.create({
         issuerId,
-        ...docs,
+        id,
+        revocationReason,
     })
     return revocationId
+}
+
+const handleIntroduction = async (issuerId, docs) => {
+    console.log(issuerId, docs)
+    return ''
 }
 
 module.exports = {
     createIssuer,
     createRevocation,
-    getIssuer,
-    getRevocationList,
+    generateIssuer,
+    generateRevocationList,
+    handleIntroduction,
 }

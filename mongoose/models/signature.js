@@ -1,12 +1,9 @@
 const _ = require('lodash')
 const mongoose = require('mongoose')
-const schema = require('../schemas/certification.template')
+const schema = require('../schemas/signature')
 const CONSTANTS = require('../../helpers/constants')
 
-const model = mongoose.model(
-    CONSTANTS.COLLECTIONS.CERTIFICATION_TEMPLATES,
-    schema
-)
+const model = mongoose.model(CONSTANTS.COLLECTIONS.SIGNATURES, schema)
 
 const create = docs => {
     return new Promise((resolve, reject) => {
@@ -22,12 +19,12 @@ const create = docs => {
     })
 }
 
-const getById = id => {
+const createMany = arrayDocs => {
     return new Promise((resolve, reject) => {
         model
-            .findById(id)
+            .insertMany(arrayDocs)
             .then(result => {
-                if (result) resolve(result._doc)
+                if (result) resolve(_.map(result, r => r._id))
                 else resolve()
             })
             .catch(error => {
@@ -36,14 +33,10 @@ const getById = id => {
     })
 }
 
-const getByIdAndPopulate = (id, populateFields) => {
+const getById = id => {
     return new Promise((resolve, reject) => {
-        const query = model.findById(id)
-        _.forEach(populateFields, f => {
-            query.populate(f)
-        })
-        query
-            .exec()
+        model
+            .findById(id)
             .then(result => {
                 if (result) resolve(result._doc)
                 else resolve()
@@ -85,23 +78,15 @@ const getManyByCondition = conditions => {
 }
 
 const getAll = () => {
-    return new Promise((resolve, reject) => {
-        model
-            .find({})
-            .then(result => {
-                if (result) {
-                    result = _.map(result, e => e._doc)
-                    resolve(result)
-                } else resolve()
-            })
-            .catch(error => {
-                reject(error.message)
-            })
-    })
+    return getManyByCondition({})
 }
 
 const updateById = (id, docs) => {
     return model.updateOne({ _id: id }, docs)
+}
+
+const updateManyByCondition = (conditions, docs) => {
+    return model.updateMany(conditions, { $set: docs })
 }
 
 const removeById = id => {
@@ -114,12 +99,13 @@ const removeAll = () => {
 
 module.exports = {
     create,
+    createMany,
     getById,
-    getByIdAndPopulate,
     getOneByCondition,
     getManyByCondition,
     getAll,
     updateById,
+    updateManyByCondition,
     removeById,
     removeAll,
 }
